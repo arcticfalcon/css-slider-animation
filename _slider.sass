@@ -1,0 +1,50 @@
+=slider($length, $stayDuration, $slideDuration)
+
+    $totalDuration: $length * ($stayDuration + $slideDuration)
+    $startSlide: ($stayDuration + $slideDuration) * 100 / $totalDuration
+    $endSlide: ($stayDuration + $slideDuration + $slideDuration) * 100 / $totalDuration
+
+    .slide
+        float: left
+        position: absolute
+        z-index: 0
+
+        animation-duration: #{$totalDuration}s
+        animation-timing-function: linear
+        animation-iteration-count: infinite
+
+    @for $i from 1 through $length
+        .slider__#{$i}
+            animation-delay: #{($i - 1) * ($stayDuration + $slideDuration) - $slideDuration}s
+
+    @each $direction, $xTranslate, $yTranslate in (left, -100%, 0), (right, 100%, 0), (top, 0, -100%), (bottom, 0, 100%)
+        .slide--#{$direction}
+            animation-name: slide-#{$direction}
+
+        @keyframes slide-#{$direction}
+            #{$startSlide}%
+                transform: translate(0, 0)
+
+            #{$endSlide}%
+                transform: translate($xTranslate, $yTranslate)
+                z-index: 1
+
+            #{$endSlide + 0.001}%
+                z-index: -1
+                transform: translate(0, 0)
+
+            100%
+                z-index: -1
+
+
+/*  Usage:
+    +slider(4, 2, .5)
+
+    HTML: the container must have defined dimensions, relative position and hidden overflow. The element order is reversed.
+    <div class="container">
+        <div class="slide slide--left slider__4"></div>
+        <div class="slide slide--top slider__3"></div>
+        <div class="slide slide--right slider__2"></div>
+        <div class="slide slide--bottom slider__1"></div>
+    </div>
+    */
